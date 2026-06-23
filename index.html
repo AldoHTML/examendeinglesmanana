@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Acordeón de Inglés — Examen</title>
+<style>
+  :root {
+    --teal: #1D9E75; --teal-bg: #E1F5EE; --teal-dk: #085041;
+    --purple: #534AB7; --purple-bg: #EEEDFE; --purple-dk: #3C3489;
+    --amber: #BA7517; --amber-bg: #FAEEDA; --amber-dk: #633806;
+    --coral: #D85A30; --coral-bg: #FAECE7; --coral-dk: #712B13;
+    --blue: #185FA5; --blue-bg: #E6F1FB; --blue-dk: #0C447C;
+    --green: #3B6D11; --green-bg: #EAF3DE; --green-dk: #27500A;
+    --pink: #993556; --pink-bg: #FBEAF0; --pink-dk: #72243E;
+    --red: #A32D2D; --red-bg: #FCEBEB; --red-dk: #791F1F;
+    --text: #1a1a1a; --text2: #555; --border: #e0ddd5;
+    --bg: #f7f6f2; --card: #ffffff;
+    --radius: 12px; --radius-sm: 8px;
+    --shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5; padding-bottom: 2rem; }
+
+  .hero { background: var(--teal); color: white; padding: 1.25rem 1rem 1rem; }
+  .hero h1 { font-size: 20px; font-weight: 600; margin-bottom: 3px; }
+  .hero p { font-size: 13px; opacity: 0.85; }
+  .hero .badge { display: inline-block; background: rgba(255,255,255,0.2); border-radius: 20px; padding: 3px 10px; font-size: 11px; margin-top: 6px; }
+
+  .container { padding: 0.75rem; display: flex; flex-direction: column; gap: 10px; }
+
+  .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; border: 1px solid var(--border); }
+
+  .card-header { display: flex; align-items: center; gap: 10px; padding: 13px 14px; cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; }
+  .card-header:active { opacity: 0.8; }
+  .icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .card-title { font-size: 15px; font-weight: 600; flex: 1; }
+  .card-sub { font-size: 11px; color: var(--text2); display: block; font-weight: 400; }
+  .chevron { font-size: 18px; color: #aaa; transition: transform 0.25s; flex-shrink: 0; }
+  .chevron.open { transform: rotate(180deg); }
+
+  .card-body { display: none; padding: 0 14px 14px; border-top: 1px solid var(--border); }
+  .card-body.open { display: block; }
+
+  .cat { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text2); margin: 12px 0 6px; }
+  .cat:first-child { margin-top: 12px; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { padding: 6px 10px; border-radius: var(--radius-sm); font-size: 13px; line-height: 1.3; }
+  .tag .en { font-weight: 600; display: block; }
+  .tag .es { font-size: 11px; opacity: 0.7; }
+
+  /* Schema table */
+  .schema { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; margin-top: 10px; }
+  .schema-row { display: flex; }
+  .schema-row + .schema-row { border-top: 1px solid var(--border); }
+  .schema-lbl { width: 90px; flex-shrink: 0; padding: 10px 8px; font-size: 11px; font-weight: 700; display: flex; align-items: center; line-height: 1.3; }
+  .schema-cnt { flex: 1; padding: 10px 10px; font-size: 13px; border-left: 1px solid var(--border); line-height: 1.5; }
+  .schema-cnt em { color: var(--text2); font-style: italic; display: block; margin-top: 4px; font-size: 12px; }
+  .schema-cnt strong { font-weight: 600; }
+
+  .formula { background: var(--teal-bg); border-left: 3px solid var(--teal); padding: 10px 12px; font-size: 13px; margin-top: 10px; line-height: 1.5; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+  .formula strong { font-weight: 600; color: var(--teal-dk); }
+  .formula em { color: var(--text2); font-style: italic; font-size: 12px; }
+
+  .tip { background: var(--blue-bg); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 12px; color: var(--blue-dk); margin-top: 10px; line-height: 1.5; }
+
+  /* Checklist */
+  .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .check-item:last-child { border-bottom: none; }
+  .check-box { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px; transition: all 0.15s; }
+  .check-box.done { background: var(--teal); border-color: var(--teal); }
+  .check-box svg { display: none; }
+  .check-box.done svg { display: block; }
+  .check-text { font-size: 14px; line-height: 1.4; padding-top: 1px; }
+  .check-text.done { color: var(--text2); text-decoration: line-through; }
+
+  /* Progress bar */
+  .progress-wrap { padding: 10px 14px; background: var(--teal-bg); display: none; }
+  .progress-wrap.show { display: block; }
+  .progress-bar { height: 6px; background: #c8edd8; border-radius: 3px; overflow: hidden; margin-top: 4px; }
+  .progress-fill { height: 100%; background: var(--teal); border-radius: 3px; transition: width 0.3s; }
+  .progress-label { font-size: 12px; color: var(--teal-dk); font-weight: 600; }
+
+  /* Footer */
+  .footer { text-align: center; font-size: 11px; color: var(--text2); padding: 1rem; margin-top: 0.5rem; }
+
+  /* Colors for sections */
+  .teal .icon { background: var(--teal-bg); color: var(--teal-dk); }
+  .purple .icon { background: var(--purple-bg); color: var(--purple-dk); }
+  .amber .icon { background: var(--amber-bg); color: var(--amber-dk); }
+  .coral .icon { background: var(--coral-bg); color: var(--coral-dk); }
+  .blue .icon { background: var(--blue-bg); color: var(--blue-dk); }
+  .pink .icon { background: var(--pink-bg); color: var(--pink-dk); }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>📚 Acordeón de Inglés</h1>
+  <p>Unit 2 · Paragraph Basics — Guía de examen</p>
+  <span class="badge">Toca cada sección para abrirla</span>
+</div>
+
+<div class="container">
+
+  <!-- CONECTORES -->
+  <div class="card teal" id="s1">
+    <div class="card-header" onclick="toggle('s1')">
+      <div class="icon">🔗</div>
+      <div class="card-title">Conectores de ideas <span class="card-sub">Sequence words · 20 frases</span></div>
+      <span class="chevron open" id="chev-s1">⌄</span>
+    </div>
+    <div class="card-body open" id="body-s1">
+      <div class="cat">Para introducir</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">First</span><span class="es">Primero</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">To begin with</span><span class="es">Para empezar</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">One reason is</span><span class="es">Una razón es</span></div>
+      </div>
+      <div class="cat">Para agregar ideas</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">Also</span><span class="es">También</span></div>
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">In addition</span><span class="es">Además</span></div>
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">Next</span><span class="es">Luego / después</span></div>
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">Then</span><span class="es">Entonces</span></div>
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">Another reason</span><span class="es">Otra razón</span></div>
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">Furthermore</span><span class="es">Es más</span></div>
+      </div>
+      <div class="cat">Para contrastar</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--coral-bg);color:var(--coral-dk)"><span class="en">However</span><span class="es">Sin embargo</span></div>
+        <div class="tag" style="background:var(--coral-bg);color:var(--coral-dk)"><span class="en">But</span><span class="es">Pero</span></div>
+        <div class="tag" style="background:var(--coral-bg);color:var(--coral-dk)"><span class="en">Although</span><span class="es">Aunque</span></div>
+        <div class="tag" style="background:var(--coral-bg);color:var(--coral-dk)"><span class="en">On the other hand</span><span class="es">Por otro lado</span></div>
+      </div>
+      <div class="cat">Para causa / resultado</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--amber-bg);color:var(--amber-dk)"><span class="en">Because</span><span class="es">Porque</span></div>
+        <div class="tag" style="background:var(--amber-bg);color:var(--amber-dk)"><span class="en">Therefore</span><span class="es">Por lo tanto</span></div>
+        <div class="tag" style="background:var(--amber-bg);color:var(--amber-dk)"><span class="en">As a result</span><span class="es">Como resultado</span></div>
+      </div>
+      <div class="cat">Para concluir</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--blue-bg);color:var(--blue-dk)"><span class="en">Finally</span><span class="es">Finalmente</span></div>
+        <div class="tag" style="background:var(--blue-bg);color:var(--blue-dk)"><span class="en">Last</span><span class="es">Por último</span></div>
+        <div class="tag" style="background:var(--blue-bg);color:var(--blue-dk)"><span class="en">In conclusion</span><span class="es">En conclusión</span></div>
+        <div class="tag" style="background:var(--blue-bg);color:var(--blue-dk)"><span class="en">In summary</span><span class="es">En resumen</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADJETIVOS -->
+  <div class="card purple" id="s2">
+    <div class="card-header" onclick="toggle('s2')">
+      <div class="icon">✨</div>
+      <div class="card-title">Adjetivos variados <span class="card-sub">4 categorías · evita repetir "good"</span></div>
+      <span class="chevron" id="chev-s2">⌄</span>
+    </div>
+    <div class="card-body" id="body-s2">
+      <div class="cat">Positivos</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">amazing</span><span class="es">asombroso</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">comfortable</span><span class="es">cómodo</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">beautiful</span><span class="es">hermoso</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">incredible</span><span class="es">increíble</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">interesting</span><span class="es">interesante</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">reliable</span><span class="es">confiable</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">organized</span><span class="es">organizado</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">popular</span><span class="es">popular</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">quiet</span><span class="es">tranquilo</span></div>
+      </div>
+      <div class="cat">Negativos</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--red-bg);color:var(--red-dk)"><span class="en">boring</span><span class="es">aburrido</span></div>
+        <div class="tag" style="background:var(--red-bg);color:var(--red-dk)"><span class="en">expensive</span><span class="es">caro</span></div>
+        <div class="tag" style="background:var(--red-bg);color:var(--red-dk)"><span class="en">difficult</span><span class="es">difícil</span></div>
+        <div class="tag" style="background:var(--red-bg);color:var(--red-dk)"><span class="en">dangerous</span><span class="es">peligroso</span></div>
+        <div class="tag" style="background:var(--red-bg);color:var(--red-dk)"><span class="en">damaged</span><span class="es">dañado</span></div>
+      </div>
+      <div class="cat">Tamaño / cantidad</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--amber-bg);color:var(--amber-dk)"><span class="en">large / big</span><span class="es">grande</span></div>
+        <div class="tag" style="background:var(--amber-bg);color:var(--amber-dk)"><span class="en">small</span><span class="es">pequeño</span></div>
+        <div class="tag" style="background:var(--amber-bg);color:var(--amber-dk)"><span class="en">simple</span><span class="es">sencillo</span></div>
+        <div class="tag" style="background:var(--amber-bg);color:var(--amber-dk)"><span class="en">special</span><span class="es">especial</span></div>
+      </div>
+      <div class="cat">Personalidad</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">careful</span><span class="es">cuidadoso</span></div>
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">patient</span><span class="es">paciente</span></div>
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">energetic</span><span class="es">enérgico</span></div>
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">important</span><span class="es">importante</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIEMPO -->
+  <div class="card amber" id="s3">
+    <div class="card-header" onclick="toggle('s3')">
+      <div class="icon">⏰</div>
+      <div class="card-title">Referencias de tiempo <span class="card-sub">Frecuencia · duración · momento</span></div>
+      <span class="chevron" id="chev-s3">⌄</span>
+    </div>
+    <div class="card-body" id="body-s3">
+      <div class="cat">Frecuencia</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--amber-bg);color:var(--amber-dk)"><span class="en">every day</span><span class="es">todos los días</span></div>
+        <div class="tag" style="background:var(--amber-bg);color:var(--amber-dk)"><span class="en">every week</span><span class="es">cada semana</span></div>
+        <div class="tag" style="background:var(--amber-bg);color:var(--amber-dk)"><span class="en">all the time</span><span class="es">todo el tiempo</span></div>
+        <div class="tag" style="background:var(--amber-bg);color:var(--amber-dk)"><span class="en">every morning</span><span class="es">cada mañana</span></div>
+      </div>
+      <div class="cat">Duración / período</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--green-bg);color:var(--green-dk)"><span class="en">for two weeks</span><span class="es">por dos semanas</span></div>
+        <div class="tag" style="background:var(--green-bg);color:var(--green-dk)"><span class="en">for many years</span><span class="es">por muchos años</span></div>
+        <div class="tag" style="background:var(--green-bg);color:var(--green-dk)"><span class="en">ten years ago</span><span class="es">hace diez años</span></div>
+        <div class="tag" style="background:var(--green-bg);color:var(--green-dk)"><span class="en">a long time</span><span class="es">mucho tiempo</span></div>
+      </div>
+      <div class="cat">Momento específico</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--blue-bg);color:var(--blue-dk)"><span class="en">in the evening</span><span class="es">en la tarde/noche</span></div>
+        <div class="tag" style="background:var(--blue-bg);color:var(--blue-dk)"><span class="en">every spring</span><span class="es">cada primavera</span></div>
+        <div class="tag" style="background:var(--blue-bg);color:var(--blue-dk)"><span class="en">during + noun</span><span class="es">durante + sustantivo</span></div>
+        <div class="tag" style="background:var(--blue-bg);color:var(--blue-dk)"><span class="en">today</span><span class="es">hoy</span></div>
+        <div class="tag" style="background:var(--blue-bg);color:var(--blue-dk)"><span class="en">soon</span><span class="es">pronto</span></div>
+        <div class="tag" style="background:var(--blue-bg);color:var(--blue-dk)"><span class="en">when + clause</span><span class="es">cuando + oración</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADVERBIOS -->
+  <div class="card coral" id="s4">
+    <div class="card-header" onclick="toggle('s4')">
+      <div class="icon">⚡</div>
+      <div class="card-title">Adverbios <span class="card-sub">Intensidad · modo · frecuencia</span></div>
+      <span class="chevron" id="chev-s4">⌄</span>
+    </div>
+    <div class="card-body" id="body-s4">
+      <div class="cat">Intensidad (antes del adjetivo)</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--coral-bg);color:var(--coral-dk)"><span class="en">extremely</span><span class="es">extremadamente</span></div>
+        <div class="tag" style="background:var(--coral-bg);color:var(--coral-dk)"><span class="en">very</span><span class="es">muy</span></div>
+        <div class="tag" style="background:var(--coral-bg);color:var(--coral-dk)"><span class="en">really</span><span class="es">realmente</span></div>
+        <div class="tag" style="background:var(--coral-bg);color:var(--coral-dk)"><span class="en">so</span><span class="es">tan</span></div>
+        <div class="tag" style="background:var(--coral-bg);color:var(--coral-dk)"><span class="en">quite</span><span class="es">bastante</span></div>
+      </div>
+      <div class="cat">Modo (después del verbo)</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">carefully</span><span class="es">cuidadosamente</span></div>
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">quickly</span><span class="es">rápidamente</span></div>
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">well</span><span class="es">bien</span></div>
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">hard</span><span class="es">duro / mucho</span></div>
+      </div>
+      <div class="cat">Frecuencia (antes del verbo principal)</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">often</span><span class="es">frecuentemente</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">usually</span><span class="es">usualmente</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">always</span><span class="es">siempre</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">never</span><span class="es">nunca</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRONOMBRES -->
+  <div class="card blue" id="s5">
+    <div class="card-header" onclick="toggle('s5')">
+      <div class="icon">👤</div>
+      <div class="card-title">Pronombres y posesivos <span class="card-sub">Para no repetir el mismo sustantivo</span></div>
+      <span class="chevron" id="chev-s5">⌄</span>
+    </div>
+    <div class="card-body" id="body-s5">
+      <div class="cat">Pronombres sujeto (antes del verbo)</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">I</span><span class="es">yo</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">You</span><span class="es">tú / usted</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">He / She</span><span class="es">él / ella</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">It</span><span class="es">eso / él/ella (cosa)</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">We</span><span class="es">nosotros</span></div>
+        <div class="tag" style="background:var(--teal-bg);color:var(--teal-dk)"><span class="en">They</span><span class="es">ellos/ellas</span></div>
+      </div>
+      <div class="cat">Pronombres objeto (después del verbo)</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--blue-bg);color:var(--blue-dk)"><span class="en">me</span><span class="es">me / a mí</span></div>
+        <div class="tag" style="background:var(--blue-bg);color:var(--blue-dk)"><span class="en">him / her</span><span class="es">lo / la</span></div>
+        <div class="tag" style="background:var(--blue-bg);color:var(--blue-dk)"><span class="en">it</span><span class="es">lo / la (cosa)</span></div>
+        <div class="tag" style="background:var(--blue-bg);color:var(--blue-dk)"><span class="en">us</span><span class="es">nos / a nosotros</span></div>
+        <div class="tag" style="background:var(--blue-bg);color:var(--blue-dk)"><span class="en">them</span><span class="es">los / las</span></div>
+      </div>
+      <div class="cat">Adjetivos posesivos (antes del sustantivo)</div>
+      <div class="tags">
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">my</span><span class="es">mi</span></div>
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">your</span><span class="es">tu / su</span></div>
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">his / her</span><span class="es">su (de él/ella)</span></div>
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">its</span><span class="es">su (de cosa)</span></div>
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">our</span><span class="es">nuestro</span></div>
+        <div class="tag" style="background:var(--purple-bg);color:var(--purple-dk)"><span class="en">their</span><span class="es">su (de ellos)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ESTRUCTURA -->
+  <div class="card blue" id="s6">
+    <div class="card-header" onclick="toggle('s6')">
+      <div class="icon">📝</div>
+      <div class="card-title">Estructura del párrafo <span class="card-sub">Paragraph structure · 3 partes</span></div>
+      <span class="chevron" id="chev-s6">⌄</span>
+    </div>
+    <div class="card-body" id="body-s6">
+      <div class="schema">
+        <div class="schema-row" style="background:var(--teal-bg)">
+          <div class="schema-lbl" style="color:var(--teal-dk)">1. Topic sentence</div>
+          <div class="schema-cnt"><strong>Idea central del párrafo.</strong> Sangría al inicio. No da detalles, solo anuncia el tema.<em>"It is easy to stay healthy if you follow some simple steps."</em></div>
+        </div>
+        <div class="schema-row">
+          <div class="schema-lbl" style="color:var(--purple-dk)">2. Body (min. 3 ideas)</div>
+          <div class="schema-cnt">
+            <strong>First,</strong> … + detalle o ejemplo.<br>
+            <strong>Also / Next,</strong> … + detalle o ejemplo.<br>
+            <strong>Another reason</strong> … + detalle o ejemplo.
+          </div>
+        </div>
+        <div class="schema-row" style="background:var(--amber-bg)">
+          <div class="schema-lbl" style="color:var(--amber-dk)">3. Concluding sentence</div>
+          <div class="schema-cnt"><strong>Repite la idea con otras palabras.</strong> No agrega info nueva. Usa adjetivo diferente al de la topic sentence.<em>"These simple steps can help anyone live a healthier life."</em></div>
+        </div>
+      </div>
+      <div class="formula">
+        <strong>Fórmula oración de apoyo:</strong><br>
+        Conector + sujeto + verbo + complemento + adjetivo<br>
+        <em>First, eating fruits every day is an excellent habit.</em>
+      </div>
+      <div class="formula">
+        <strong>Fórmula concluding sentence:</strong><br>
+        Retoma tema + reflexión final (sin nueva información)<br>
+        <em>These are the reasons why staying healthy is not complicated.</em>
+      </div>
+      <div class="tip">💡 Usa pronombres (he, she, they, them) para no repetir el mismo sustantivo. Usa posesivos (my, her, their) para mostrar pertenencia.</div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="card pink" id="s7">
+    <div class="card-header" onclick="toggle('s7')">
+      <div class="icon">✅</div>
+      <div class="card-title">Checklist antes de entregar <span class="card-sub">Toca para marcar cada punto</span></div>
+      <span class="chevron" id="chev-s7">⌄</span>
+    </div>
+    <div class="progress-wrap" id="prog-wrap">
+      <span class="progress-label" id="prog-label">0 / 7 completados</span>
+      <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+    <div class="card-body" id="body-s7">
+      <div id="checklist"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">Acordeón generado para Unit 2 · Paragraph Basics<br>¡Mucho ánimo en tu examen! 🎯</div>
+
+<script>
+var checks = [
+  "El párrafo tiene título",
+  "La topic sentence tiene sangría (indent)",
+  "Hay mínimo 3 razones o ejemplos en el body",
+  "Usé conectores (First, Also, Finally…) en cada idea",
+  "Usé adjetivos variados (no repetir 'good' o 'interesting')",
+  "Usé pronombres sujeto/objeto para evitar repetición",
+  "La concluding sentence retoma la idea sin agregar info nueva"
+];
+var html = '';
+checks.forEach(function(t, i) {
+  html += '<div class="check-item" onclick="toggleCheck(' + i + ')" id="ci' + i + '">'
+    + '<div class="check-box" id="cb' + i + '">'
+    + '<svg width="13" height="10" viewBox="0 0 13 10" fill="none"><path d="M1 5L5 9L12 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    + '</div>'
+    + '<span class="check-text" id="ct' + i + '">' + t + '</span>'
+    + '</div>';
+});
+document.getElementById('checklist').innerHTML = html;
+
+var done = Array(checks.length).fill(false);
+function toggleCheck(i) {
+  done[i] = !done[i];
+  document.getElementById('cb' + i).classList.toggle('done', done[i]);
+  document.getElementById('ct' + i).classList.toggle('done', done[i]);
+  var count = done.filter(Boolean).length;
+  document.getElementById('prog-label').textContent = count + ' / ' + checks.length + ' completados';
+  document.getElementById('prog-fill').style.width = Math.round(count / checks.length * 100) + '%';
+  var wrap = document.getElementById('prog-wrap');
+  wrap.classList.toggle('show', document.getElementById('body-s7').classList.contains('open'));
+}
+
+function toggle(id) {
+  var body = document.getElementById('body-' + id);
+  var chev = document.getElementById('chev-' + id);
+  var isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
+  if (id === 's7') {
+    var count = done.filter(Boolean).length;
+    var wrap = document.getElementById('prog-wrap');
+    wrap.classList.toggle('show', !isOpen);
+  }
+}
+</script>
+</body>
+</html>
